@@ -528,8 +528,11 @@ function extractNameFromTemplate(value) {
  *   unbracketTag('<span>') => 'span'
  *   unbracketTag('<a>') => 'a'
  */
-function unbracketTag(/* str */) {
-  throw new Error('Not implemented');
+function unbracketTag(str) {
+  if (typeof str !== 'string') {
+    return '';
+  }
+  return str.slice(1, -1);
 }
 
 /**
@@ -547,8 +550,16 @@ function unbracketTag(/* str */) {
  *   ],
  *   'info@gmail.com' => ['info@gmail.com']
  */
-function extractEmails(/* str */) {
-  throw new Error('Not implemented');
+function extractEmails(str) {
+  if (typeof str !== 'string') {
+    return [];
+  }
+  const res = [];
+  const emails = str.split(';');
+  for (let i = 0; i < emails.length; i += 1) {
+    res.push(emails[i].trim());
+  }
+  return res;
 }
 
 /**
@@ -567,8 +578,27 @@ function extractEmails(/* str */) {
  *    => 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
  *
  */
-function encodeToRot13(/* str */) {
-  throw new Error('Not implemented');
+function encodeToRot13(str) {
+  if (typeof str !== 'string') {
+    return '';
+  }
+
+  return str.replace(/[a-zA-Z]/g, (char) => {
+    // Get the ASCII code
+    const code = char.charCodeAt(0);
+
+    // Handle uppercase letters (A-Z: 65-90)
+    if (code >= 65 && code <= 90) {
+      return String.fromCharCode(((code - 65 + 13) % 26) + 65);
+    }
+
+    // Handle lowercase letters (a-z: 97-122)
+    if (code >= 97 && code <= 122) {
+      return String.fromCharCode(((code - 97 + 13) % 26) + 97);
+    }
+
+    return char;
+  });
 }
 
 /**
@@ -595,8 +625,43 @@ function encodeToRot13(/* str */) {
  *   'Q♠' => 50
  *   'K♠' => 51
  */
-function getCardId(/* value */) {
-  throw new Error('Not implemented');
+function getCardId(value) {
+  if (typeof value !== 'string') {
+    return -1;
+  }
+
+  const ranks = [
+    'A',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    'J',
+    'Q',
+    'K',
+  ];
+  const suits = ['♣', '♦', '♥', '♠'];
+
+  // Split the card value into rank and suit
+  const rank = value.slice(0, -1); // Everything except last character
+  const suit = value.slice(-1); // Last character
+
+  // Get the position of rank and suit
+  const rankIndex = ranks.indexOf(rank);
+  const suitIndex = suits.indexOf(suit);
+
+  // If either rank or suit is invalid, return -1
+  if (rankIndex === -1 || suitIndex === -1) {
+    return -1;
+  }
+
+  // Calculate the index using the formula: (suit index * 13) + rank index
+  return suitIndex * 13 + rankIndex;
 }
 
 module.exports = {
